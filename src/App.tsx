@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { MazeSceneFactory } from "./MazeSceneFactory";
+import { MazeCanvasProvider, MazeSceneFactory } from "./MazeSceneFactory";
 import { DependencyContainerContext, Container, useInstance } from '@symbiotic/green-state';
 import { MazeRunnerIOC } from "./MazeRunnerIOC";
 
@@ -16,11 +16,16 @@ class AppContainer extends DependencyContainerContext {
 
 const MazeRunner = () => {
   const canvasRef = useRef(null);
+  const canvasProvider = useInstance(MazeCanvasProvider) as MazeCanvasProvider;
   const mazeFactory = useInstance(MazeSceneFactory) as MazeSceneFactory;
 
   useEffect(() => {
-    mazeFactory.startScene({ canvasRef: canvasRef.current as unknown as HTMLCanvasElement})
-  }, [canvasRef, mazeFactory]);
+    if (canvasRef.current){
+      canvasProvider.setCanvas(canvasRef.current)
+      mazeFactory.startScene();
+    }
+
+  }, [canvasRef, mazeFactory, canvasProvider]);
 
   return (<canvas id="renderCanvas" ref={canvasRef} style={{ width: '100%', height: '100%'}} />);
 }

@@ -1,8 +1,23 @@
 import { Engine, Scene, FreeCamera, Vector3, HemisphericLight, Mesh, MeshBuilder } from 'babylonjs';
 
+
+export class MazeCanvasProvider {
+    setCanvas = (canvas: HTMLCanvasElement) => {
+        this.canvas = canvas;
+    }
+    getCanvas = (): HTMLCanvasElement => {
+        return this.canvas!;
+    }
+    private canvas?: HTMLCanvasElement;
+}
+
 export class MazeSceneFactory {
-    startScene = ({ canvasRef }: { canvasRef: HTMLCanvasElement }): void => {
-        const engine = new Engine(canvasRef, true, { preserveDrawingBuffer: true, stencil: true });
+    static inject = () => [MazeCanvasProvider];
+    constructor(private canvasProvider: MazeCanvasProvider){}
+
+    startScene = (): void => {
+        const canvas = this.canvasProvider.getCanvas();
+        const engine = new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
         // Create a basic BJS Scene object
         const scene = new Scene(engine);
         // Create a FreeCamera, and set its position to {x: 0, y: 5, z: -10}
@@ -10,7 +25,7 @@ export class MazeSceneFactory {
         // Target the camera to scene origin
         camera.setTarget(Vector3.Zero());
         // Attach the camera to the canvas
-        camera.attachControl(canvasRef, false);
+        camera.attachControl(canvas, false);
         // Create a basic light, aiming 0, 1, 0 - meaning, to the sky
         new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
         // Create a built-in "sphere" shape; its constructor takes 6 params: name, segment, diameter, scene, updatable, sideOrientation
