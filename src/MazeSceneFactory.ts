@@ -1,5 +1,21 @@
-import { Engine, Scene, FreeCamera, Vector3, HemisphericLight, Mesh, MeshBuilder } from 'babylonjs';
+import { Engine, Scene, FreeCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Camera } from 'babylonjs';
 
+export class MazeCameraFactory {
+    static inject = () => [MazeCanvasProvider];
+    constructor(private canvasProvider: MazeCanvasProvider){}
+    createAndAttachCamera = ({ scene }: { scene: Scene }): Camera => {
+        const canvas = this.canvasProvider.getCanvas();
+
+        // Create a FreeCamera, and set its position to {x: 0, y: 5, z: -10}
+        const camera = new FreeCamera('camera1', new Vector3(0, 5, -10), scene);
+        // Target the camera to scene origin
+        camera.setTarget(Vector3.Zero());
+        // Attach the camera to the canvas
+        camera.attachControl(canvas, false);
+
+        return camera;
+    }
+}
 
 export class MazeCanvasProvider {
     setCanvas = (canvas: HTMLCanvasElement) => {
@@ -12,20 +28,17 @@ export class MazeCanvasProvider {
 }
 
 export class MazeSceneFactory {
-    static inject = () => [MazeCanvasProvider];
-    constructor(private canvasProvider: MazeCanvasProvider){}
+    static inject = () => [MazeCanvasProvider, MazeCameraFactory];
+    constructor(private canvasProvider: MazeCanvasProvider, private cameraFactory: MazeCameraFactory){}
 
     startScene = (): void => {
         const canvas = this.canvasProvider.getCanvas();
         const engine = new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
         // Create a basic BJS Scene object
         const scene = new Scene(engine);
-        // Create a FreeCamera, and set its position to {x: 0, y: 5, z: -10}
-        const camera = new FreeCamera('camera1', new Vector3(0, 5, -10), scene);
-        // Target the camera to scene origin
-        camera.setTarget(Vector3.Zero());
-        // Attach the camera to the canvas
-        camera.attachControl(canvas, false);
+
+        this.cameraFactory.createAndAttachCamera({ scene });
+
         // Create a basic light, aiming 0, 1, 0 - meaning, to the sky
         new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
         // Create a built-in "sphere" shape; its constructor takes 6 params: name, segment, diameter, scene, updatable, sideOrientation
