@@ -1,5 +1,12 @@
 import { useRef, useEffect } from "react";
 import { MazeSceneFactory } from "./MazeSceneFactory";
+import { DependencyContainerContext, Container, useInstance } from '@symbiotic/green-state';
+
+class AppContainer extends DependencyContainerContext {
+  containerMounted = (container: Container) => {
+
+  }
+}
 
 // TODO: quotes
 // TODO: 4 spaces
@@ -8,17 +15,20 @@ import { MazeSceneFactory } from "./MazeSceneFactory";
 
 const MazeRunner = () => {
   const canvasRef = useRef(null);
+  const mazeFactory = useInstance(MazeSceneFactory) as MazeSceneFactory;
 
   useEffect(() => {
-    new MazeSceneFactory().startScene({ canvasRef: canvasRef.current as unknown as HTMLCanvasElement})
-  }, [canvasRef]);
+    mazeFactory.startScene({ canvasRef: canvasRef.current as unknown as HTMLCanvasElement})
+  }, [canvasRef, mazeFactory]);
 
   return (<canvas id="renderCanvas" ref={canvasRef} style={{ width: '100%', height: '100%'}} />);
 }
 
 function App() {
   return (
-    <MazeRunner />
+    <AppContainer>
+      <MazeRunner />
+    </AppContainer>
   );
 }
 
