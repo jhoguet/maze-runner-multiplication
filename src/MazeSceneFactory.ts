@@ -1,21 +1,13 @@
-import { Engine, Scene, FreeCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Camera } from 'babylonjs';
+import {
+    Engine,
+    Scene,
+    Vector3,
+    HemisphericLight,
+    Mesh,
+    MeshBuilder,
+} from 'babylonjs';
+import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 
-export class MazeCameraFactory {
-    static inject = () => [MazeCanvasProvider];
-    constructor(private canvasProvider: MazeCanvasProvider){}
-    createAndAttachCamera = ({ scene }: { scene: Scene }): Camera => {
-        const canvas = this.canvasProvider.getCanvas();
-
-        // Create a FreeCamera, and set its position to {x: 0, y: 5, z: -10}
-        const camera = new FreeCamera('camera1', new Vector3(0, 5, -10), scene);
-        // Target the camera to scene origin
-        camera.setTarget(Vector3.Zero());
-        // Attach the camera to the canvas
-        camera.attachControl(canvas, false);
-
-        return camera;
-    }
-}
 
 export class MazeCanvasProvider {
     setCanvas = (canvas: HTMLCanvasElement) => {
@@ -28,8 +20,8 @@ export class MazeCanvasProvider {
 }
 
 export class MazeSceneFactory {
-    static inject = () => [MazeCanvasProvider, MazeCameraFactory];
-    constructor(private canvasProvider: MazeCanvasProvider, private cameraFactory: MazeCameraFactory){}
+    static inject = () => [MazeCanvasProvider, MazeUniversalCameraFactory];
+    constructor(private canvasProvider: MazeCanvasProvider, private cameraFactory: MazeUniversalCameraFactory) { }
 
     startScene = (): void => {
         const canvas = this.canvasProvider.getCanvas();
