@@ -1,10 +1,11 @@
 import { useRef, useEffect } from "react";
 import { MazeSceneFactory } from "./MazeSceneFactory";
 import { DependencyContainerContext, Container, useInstance } from '@symbiotic/green-state';
+import { MazeRunnerIOC } from "./MazeRunnerIOC";
 
 class AppContainer extends DependencyContainerContext {
   containerMounted = (container: Container) => {
-
+    (container.get(MazeRunnerIOC) as MazeRunnerIOC).injectDependencies();
   }
 }
 
