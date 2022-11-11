@@ -65,26 +65,25 @@ export class FreeCameraKeyboardWalkInput implements ICameraInput<FreeCamera>{
     checkInputs = () => {
         if (this.unsubscribeFromKeyboard) {
             var camera = this.camera;
-            for (var index = 0; index < this._keys.length; index++) {
-                var keyCode = this._keys[index];
+            for (const key of this._keys){
                 var speed = this.camera!.speed;
-                if (this.keysLeft.indexOf(keyCode) !== -1) {
+                if (this.keysLeft.includes(key)) {
                     // TODO:
                     this.camera!.rotation.y -= (this.camera as any).angularSpeed;
 
                     // TODO:
                     (this.camera! as any).direction.copyFromFloats(0, 0, 0);
                 }
-                else if (this.keysUp.indexOf(keyCode) !== -1) {
+                else if (this.keysUp.includes(key)) {
                     // TODO
                     (this.camera! as any).direction.copyFromFloats(0, 0, speed);
                 }
-                else if (this.keysRight.indexOf(keyCode) !== -1) {
+                else if (this.keysRight.includes(key)) {
                     // TODO:
                     this.camera!.rotation.y += (this.camera as any).angularSpeed;;
                     (this.camera! as any).direction.copyFromFloats(0, 0, 0);
                 }
-                else if (this.keysDown.indexOf(keyCode) !== -1) {
+                else if (this.keysDown.includes(key)) {
                     (this.camera! as any).direction.copyFromFloats(0, 0, -speed);
                 }
                 if (this.camera!.getScene().useRightHandedSystem) {
