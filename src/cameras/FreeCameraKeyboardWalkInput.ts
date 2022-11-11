@@ -2,19 +2,13 @@ import { FreeCamera, ICameraInput } from 'babylonjs';
 import { Nullable } from 'babylonjs/index';
 
 export class FreeCameraKeyboardWalkInput implements ICameraInput<FreeCamera>{
-    constructor() {
-        this._keys = [];
-        this.keysUp = [38, 87];
-        this.keysDown = [40, 83];
-        this.keysLeft = [37, 65];
-        this.keysRight = [39, 68];
-    }
     camera: Nullable<FreeCamera> = null;
-    private _keys: number[] = [];
-    private keysLeft: number[];
-    private keysUp: number[];
-    private keysRight: number[];
-    private keysDown: number[];
+    // TODO: consistency on _
+    private _keys: string[] = [];
+    private keysLeft: string[] = ['a'];
+    private keysUp: string[] = ['w'];
+    private keysRight: string[] = ['d'];
+    private keysDown: string[] = ['s'];
     private canvas: any;
 
     private unsubscribeFromKeyboard?: () => void;
@@ -29,15 +23,9 @@ export class FreeCameraKeyboardWalkInput implements ICameraInput<FreeCamera>{
         const engine = this.camera!.getEngine();
         const element = engine.getInputElement();
         const onKeyDown = (evt: KeyboardEvent) => {
-            console.log(evt.code);
-            // TODO: keyCode
-            if (this.keysUp.indexOf(evt.keyCode) !== -1 ||
-                this.keysDown.indexOf(evt.keyCode) !== -1 ||
-                this.keysLeft.indexOf(evt.keyCode) !== -1 ||
-                this.keysRight.indexOf(evt.keyCode) !== -1) {
-                var index = this._keys.indexOf(evt.keyCode);
-                if (index === -1) {
-                    this._keys.push(evt.keyCode);
+            if ([...this.keysUp, ...this.keysDown, ...this.keysLeft, ...this.keysRight].includes(evt.key)) {
+                if (!this._keys.includes(evt.key)){
+                    this._keys.push(evt.key);
                 }
                 if (!noPreventDefault) {
                     evt.preventDefault();
@@ -45,14 +33,11 @@ export class FreeCameraKeyboardWalkInput implements ICameraInput<FreeCamera>{
             }
         }
         const onKeyUp = (evt: KeyboardEvent) => {
-            if (this.keysUp.indexOf(evt.keyCode) !== -1 ||
-                this.keysDown.indexOf(evt.keyCode) !== -1 ||
-                this.keysLeft.indexOf(evt.keyCode) !== -1 ||
-                this.keysRight.indexOf(evt.keyCode) !== -1) {
-                var index = this._keys.indexOf(evt.keyCode);
-                if (index >= 0) {
-                    this._keys.splice(index, 1);
+            if ([...this.keysUp, ...this.keysDown, ...this.keysLeft, ...this.keysRight].includes(evt.key)) {
+                if (this._keys.includes(evt.key)){
+                    this._keys.splice(this._keys.indexOf(evt.key), 1);
                 }
+
                 if (!noPreventDefault) {
                     evt.preventDefault();
                 }
