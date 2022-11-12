@@ -15,6 +15,7 @@ export class MazeUniversalCameraFactory {
 
         var camera = new UniversalCamera("camera1", new Vector3(0, 5, -10), scene);
         camera.checkCollisions = true
+        camera.applyGravity = true
 
         camera.minZ = 0.0001;
         camera.attachControl(canvas, true);
