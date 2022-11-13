@@ -10,6 +10,13 @@ import {
 } from 'babylonjs';
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 
+var randomNumber = function (min: number, max: number) {
+    if (min === max) {
+        return (min);
+    }
+    var random = Math.random();
+    return ((random * (max - min)) + min);
+};
 
 export class MazeCanvasProvider {
     setCanvas = (canvas: HTMLCanvasElement) => {
@@ -49,6 +56,21 @@ export class MazeSceneFactory {
         const groundMaterial = new StandardMaterial('groundMaterial');
         ground.material = groundMaterial;
         groundMaterial.diffuseTexture = new Texture('https://www.babylonjs-playground.com/textures/floor.png', scene);
+
+
+        // Create a wall
+        var box = MeshBuilder.CreateBox("crate", { size: 2, height: 13, depth: 13, width: 0 }, scene);
+        const boxMaterial = new StandardMaterial("Mat", scene);
+        box.material = boxMaterial
+        boxMaterial.diffuseTexture = new Texture("https://www.babylonjs-playground.com/textures/crate.png", scene);
+        box.checkCollisions = true;
+
+        var theta = 0;
+        var radius = 6;
+        const boxY = (radius + randomNumber(-0.5 * radius, 0.5 * radius)) * Math.sin(theta + randomNumber(-0.1 * theta, 0.1 * theta));
+        const boxX = (radius + randomNumber(-0.5 * radius, 0.5 * radius)) * Math.cos(theta + randomNumber(-0.1 * theta, 0.1 * theta));
+        box.position = new Vector3(boxX, 6, boxY);
+
         // Return the created scene
         engine.runRenderLoop(function () {
             scene.render();
