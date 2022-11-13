@@ -45,10 +45,10 @@ export class MazeSceneFactory {
         // Create a basic light, aiming 0, 1, 0 - meaning, to the sky
         new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
         // Create a built-in "sphere" shape; its constructor takes 6 params: name, segment, diameter, scene, updatable, sideOrientation
-        const sphere = MeshBuilder.CreateSphere('sphere1', { segments: 16, diameter: 2, sideOrientation: Mesh.FRONTSIDE }, scene);
-        sphere.checkCollisions = true
+        // const sphere = MeshBuilder.CreateSphere('sphere1', { segments: 16, diameter: 2, sideOrientation: Mesh.FRONTSIDE }, scene);
+        // sphere.checkCollisions = true
         // Move the sphere upward 1/2 of its height
-        sphere.position.y = 1;
+        // sphere.position.y = 1;
         // Create a built-in "ground" shape; its constructor takes 6 params : name, width, height, subdivision, scene, updatable
         const ground = MeshBuilder.CreateGround('ground1', { width: 30, height: 30, subdivisions: 2 }, scene);
         ground.checkCollisions = true;
@@ -69,7 +69,7 @@ export class MazeSceneFactory {
         var radius = 6;
         const boxY = (radius + randomNumber(-0.5 * radius, 0.5 * radius)) * Math.sin(theta + randomNumber(-0.1 * theta, 0.1 * theta));
         const boxX = (radius + randomNumber(-0.5 * radius, 0.5 * radius)) * Math.cos(theta + randomNumber(-0.1 * theta, 0.1 * theta));
-        box.position = new Vector3(boxX, 6, boxY);
+        box.position = new Vector3(boxX, 6.5, boxY);
 
         // Return the created scene
         engine.runRenderLoop(function () {
