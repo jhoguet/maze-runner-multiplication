@@ -51,68 +51,40 @@ export class MazeSceneFactory {
         // Move the sphere upward 1/2 of its height
         // sphere.position.y = 1;
         // Create a built-in "ground" shape; its constructor takes 6 params : name, width, height, subdivision, scene, updatable
-        const groundSize = 50;
+        const groundSize = 100;
         const ground = MeshBuilder.CreateGround('ground1', { width: groundSize, height: groundSize, subdivisions: 2 }, scene);
         ground.checkCollisions = true;
 
         const groundMaterial = new StandardMaterial('groundMaterial');
         ground.material = groundMaterial;
         groundMaterial.diffuseTexture = new Texture('https://www.babylonjs-playground.com/textures/floor.png', scene);
-        
+
 
         const wallHeight = 15;
         // Create a wall
         this.createWall({
-            centerX: 0,
-            centerY: groundSize / 2,
-            width: groundSize,
+            centerX: 10,
+            centerY: 10,
+            width: 20,
             height: wallHeight,
             rotationDegrees: 0,
             scene
         });
 
         this.createWall({
-            centerX: 0,
-            centerY: groundSize / 2,
-            width: groundSize,
+            centerX: -15,
+            centerY: 10,
+            width: 20,
             height: wallHeight,
             rotationDegrees: 0,
             scene
         });
 
-        this.createWall({
-            centerX: 0,
-            centerY: -groundSize / 2,
-            width: groundSize,
-            height: wallHeight,
-            rotationDegrees: 0,
-            scene
-        });
-
-        this.createWall({
-            centerX: groundSize / 2,
-            centerY: 0,
-            width: groundSize,
-            height: wallHeight,
-            rotationDegrees: 90,
-            scene
-        });
-
-        this.createWall({
-            centerX: -groundSize / 2,
-            centerY: 0,
-            width: groundSize,
-            height: wallHeight,
-            rotationDegrees: 90,
-            scene
-        });
         ground.material = groundMaterial
         const texture = new Texture('https://www.babylonjs-playground.com/textures/floor.png')
         groundMaterial.diffuseTexture = texture
         texture.uScale = groundSize / 10
         texture.vScale = groundSize / 10
-
-        
 
         // Return the created scene
         engine.runRenderLoop(function () {
