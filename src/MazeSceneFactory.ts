@@ -7,6 +7,7 @@ import {
     MeshBuilder,
     StandardMaterial,
     Texture,
+    Tools
 } from 'babylonjs';
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 
@@ -50,7 +51,7 @@ export class MazeSceneFactory {
         // Move the sphere upward 1/2 of its height
         // sphere.position.y = 1;
         // Create a built-in "ground" shape; its constructor takes 6 params : name, width, height, subdivision, scene, updatable
-        const groundSize = 30;
+        const groundSize = 50;
         const ground = MeshBuilder.CreateGround('ground1', { width: groundSize, height: groundSize, subdivisions: 2 }, scene);
         ground.checkCollisions = true;
 
@@ -59,12 +60,14 @@ export class MazeSceneFactory {
         groundMaterial.diffuseTexture = new Texture('https://www.babylonjs-playground.com/textures/floor.png', scene);
 
 
+        const wallHeight = 15;
         // Create a wall
         this.createWall({
             centerX: 0,
             centerY: groundSize / 2,
-            width: 30,
-            height: 15,
+            width: groundSize,
+            height: wallHeight,
+            rotationDegrees: 0,
             scene
         });
 
@@ -78,8 +81,9 @@ export class MazeSceneFactory {
         });
     }
 
-    private createWall = ({ centerX, centerY, width, height, scene }: { centerX: number, centerY: number, width: number, height: number, scene: Scene }) => {
+    private createWall = ({ centerX, centerY, width, height, scene, rotationDegrees }: { centerX: number, centerY: number, width: number, height: number, scene: Scene, rotationDegrees: number }) => {
         var box = MeshBuilder.CreateBox("crate", { size: 2, height, depth: .5, width }, scene);
+        box.rotation.y = Tools.ToRadians(rotationDegrees);
         const boxMaterial = new StandardMaterial("Mat", scene);
         box.material = boxMaterial
         boxMaterial.diffuseTexture = new Texture("https://www.babylonjs-playground.com/textures/crate.png", scene);
