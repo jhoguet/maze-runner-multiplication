@@ -80,6 +80,15 @@ export class MazeSceneFactory {
             scene
         });
 
+        var gap = MeshBuilder.CreateBox("crate", { size: 2, height: wallHeight, depth: .5, width: 5 }, scene);
+        gap.rotation.y = Tools.ToRadians(0);
+        const boxMaterial = new StandardMaterial("Mat", scene);
+        gap.material = boxMaterial
+        boxMaterial.diffuseTexture = new Texture("https://assets.babylonjs.com/environments/roof.jpg", scene);
+        gap.checkCollisions = false;
+
+        gap.position = new Vector3(-2.5, wallHeight / 2, 10);
+
         ground.material = groundMaterial
         const texture = new Texture('https://www.babylonjs-playground.com/textures/floor.png')
         groundMaterial.diffuseTexture = texture
