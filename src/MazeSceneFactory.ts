@@ -58,7 +58,7 @@ export class MazeSceneFactory {
         const groundMaterial = new StandardMaterial('groundMaterial');
         ground.material = groundMaterial;
         groundMaterial.diffuseTexture = new Texture('https://www.babylonjs-playground.com/textures/floor.png', scene);
-
+        
 
         const wallHeight = 15;
         // Create a wall
@@ -106,6 +106,11 @@ export class MazeSceneFactory {
             rotationDegrees: 90,
             scene
         });
+        ground.material = groundMaterial
+        const texture = new Texture('https://www.babylonjs-playground.com/textures/floor.png')
+        groundMaterial.diffuseTexture = texture
+        texture.uScale = groundSize / 10
+        texture.vScale = groundSize / 10
 
         
 
