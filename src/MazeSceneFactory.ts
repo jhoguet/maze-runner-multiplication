@@ -71,6 +71,44 @@ export class MazeSceneFactory {
             scene
         });
 
+        this.createWall({
+            centerX: 0,
+            centerY: groundSize / 2,
+            width: groundSize,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
+            centerX: 0,
+            centerY: -groundSize / 2,
+            width: groundSize,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
+            centerX: groundSize / 2,
+            centerY: 0,
+            width: groundSize,
+            height: wallHeight,
+            rotationDegrees: 90,
+            scene
+        });
+
+        this.createWall({
+            centerX: -groundSize / 2,
+            centerY: 0,
+            width: groundSize,
+            height: wallHeight,
+            rotationDegrees: 90,
+            scene
+        });
+
+        
+
         // Return the created scene
         engine.runRenderLoop(function () {
             scene.render();
