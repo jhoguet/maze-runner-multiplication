@@ -108,14 +108,18 @@ export class MazeSceneFactory {
         texture.uScale = groundSize / 10
         texture.vScale = groundSize / 10
 
+        let number1 = Math.round(randomNumber(1, 12))
+        let number2 = Math.round(randomNumber(1, 12))
+        let answer = number1 * number2
+
 
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('gui');
 
         const gapTexture = AdvancedDynamicTexture.CreateForMesh(gap);
 
         const gapRect = new Rectangle();
-        const gapText = new TextBlock("text1", "30");
-        gapRect.width = .2;
+        const gapText = new TextBlock("text1", String(answer));
+        gapRect.width = .4;
         gapRect.height = '60px';
         gapRect.cornerRadius = 20;
         gapRect.thickness = 4;
@@ -125,8 +129,6 @@ export class MazeSceneFactory {
         gapTexture.addControl(gapRect);
 
         // gui test
-        let number1 = Math.round(randomNumber(1, 12))
-        let number2 = Math.round(randomNumber(1, 12))
         const rect = new Rectangle();
         const text = new TextBlock("text",String(number1) + " x " + String(number2));
         rect.width = .2;
