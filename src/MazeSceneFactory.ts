@@ -111,6 +111,19 @@ export class MazeSceneFactory {
 
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('gui');
 
+        const gapTexture = AdvancedDynamicTexture.CreateForMesh(gap);
+
+        const gapRect = new Rectangle();
+        const gapText = new TextBlock("text1", "30");
+        gapRect.width = .2;
+        gapRect.height = '60px';
+        gapRect.cornerRadius = 20;
+        gapRect.thickness = 4;
+        gapRect.background = 'green';
+        gapRect.fontSize = '50px'
+        gapRect.addControl(gapText);
+        gapTexture.addControl(gapRect);
+
         // gui test
         let number1 = Math.round(randomNumber(1, 12))
         let number2 = Math.round(randomNumber(1, 12))
@@ -121,11 +134,8 @@ export class MazeSceneFactory {
         rect.cornerRadius = 20;
         rect.thickness = 4;
         rect.background = 'green';
-        
-
+        rect.addControl(text)
         advancedTexture.addControl(rect);
-        advancedTexture.addControl(text)
-
 
         // Return the created scene
         engine.runRenderLoop(function () {
