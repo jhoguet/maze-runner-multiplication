@@ -12,6 +12,8 @@ import {
     ActionManager,
     Color3
 } from '@babylonjs/core';
+import { Rectangle, AdvancedDynamicTexture } from '@babylonjs/gui/2D';
+
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 
 var randomNumber = function (min: number, max: number) {
@@ -105,6 +107,19 @@ export class MazeSceneFactory {
         groundMaterial.diffuseTexture = texture
         texture.uScale = groundSize / 10
         texture.vScale = groundSize / 10
+
+
+        const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('gui');
+
+        // gui test
+        const rect = new Rectangle();
+        rect.width = .2;
+        rect.height = '40px';
+        rect.cornerRadius = 20;
+        rect.thickness = 4;
+        rect.background = 'green';
+
+        advancedTexture.addControl(rect);
 
         // Return the created scene
         engine.runRenderLoop(function () {
