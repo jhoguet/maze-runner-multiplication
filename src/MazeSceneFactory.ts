@@ -85,7 +85,7 @@ export class MazeSceneFactory {
             scene
         });
 
-        var gap = MeshBuilder.CreateBox("gap", { size: 2, height: wallHeight, depth: .5, width: 5 }, scene);
+        const gap = MeshBuilder.CreatePlane("gap", { size: 2, height: wallHeight, width: 5 }, scene);
         gap.rotation.y = Tools.ToRadians(0);
         const boxMaterial = new StandardMaterial("Mat", scene);
         boxMaterial.diffuseColor = Color3.Blue();
