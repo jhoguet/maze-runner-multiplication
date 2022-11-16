@@ -2,7 +2,7 @@ import {
     Scene,
     Vector3,
     UniversalCamera,
-} from 'babylonjs';
+} from '@babylonjs/core';
 import { MazeCanvasProvider } from '../MazeSceneFactory';
 import { FreeCameraKeyboardWalkInput } from './FreeCameraKeyboardWalkInput';
 import { FreeCameraSearchInput } from './FreeCameraSearchInput';
@@ -22,7 +22,7 @@ export class MazeUniversalCameraFactory {
         camera.speed = 0.02;
         (camera as any).angularSpeed = 0.05;
         (camera as any).angle = Math.PI/2;
-        (camera as any).direction = new BABYLON.Vector3(Math.cos((camera as any).angle), 0, Math.sin((camera as any).angle));
+        (camera as any).direction = new Vector3(Math.cos((camera as any).angle), 0, Math.sin((camera as any).angle));
 
         camera.inputs.removeByType("FreeCameraKeyboardMoveInput");
         camera.inputs.removeByType("FreeCameraMouseInput");

@@ -1,5 +1,5 @@
-import { FreeCamera, ICameraInput } from 'babylonjs';
-import { Nullable } from 'babylonjs/index';
+import { FreeCamera, ICameraInput, Tools, Vector3 } from '@babylonjs/core';
+import { Nullable } from '@babylonjs/core/index';
 
 export class FreeCameraKeyboardWalkInput implements ICameraInput<FreeCamera>{
     camera: Nullable<FreeCamera> = null;
@@ -56,7 +56,7 @@ export class FreeCameraKeyboardWalkInput implements ICameraInput<FreeCamera>{
         if (this.unsubscribeFromKeyboard){
             this.unsubscribeFromKeyboard();
             this.unsubscribeFromKeyboard = undefined;
-            BABYLON.Tools.UnregisterTopRootEvents(this.canvas, [
+            Tools.UnregisterTopRootEvents(this.canvas, [
                 { name: "blur", handler: this._onLostFocus }
             ]);
             this._keys = [];
@@ -90,7 +90,7 @@ export class FreeCameraKeyboardWalkInput implements ICameraInput<FreeCamera>{
                     (this.camera! as any).direction.z *= -1;
                 }
                 this.camera!.getViewMatrix().invertToRef((this.camera as any)._cameraTransformMatrix);
-                BABYLON.Vector3.TransformNormalToRef((this.camera! as any).direction, (this.camera as any)._cameraTransformMatrix, (camera as any)._transformedDirection);
+                Vector3.TransformNormalToRef((this.camera! as any).direction, (this.camera as any)._cameraTransformMatrix, (camera as any)._transformedDirection);
                 this.camera!.cameraDirection.addInPlace((this.camera as any)._transformedDirection);
             }
         }

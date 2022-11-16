@@ -1,5 +1,5 @@
-import { FreeCamera, ICameraInput } from 'babylonjs';
-import { Nullable } from 'babylonjs/index';
+import { FreeCamera, ICameraInput, PointerEventTypes } from '@babylonjs/core';
+import { Nullable } from '@babylonjs/core/index';
 
 export class FreeCameraSearchInput implements ICameraInput<FreeCamera>{
     constructor(touchEnabled: boolean = true) {
@@ -52,10 +52,10 @@ export class FreeCameraSearchInput implements ICameraInput<FreeCamera>{
                 if (!this.touchEnabled && evt.pointerType === "touch") {
                     return;
                 }
-                if (p.type !== BABYLON.PointerEventTypes.POINTERMOVE && this.buttons.indexOf(evt.button) === -1) {
+                if (p.type !== PointerEventTypes.POINTERMOVE && this.buttons.indexOf(evt.button) === -1) {
                     return;
                 }
-                if (p.type === BABYLON.PointerEventTypes.POINTERDOWN) {
+                if (p.type === PointerEventTypes.POINTERDOWN) {
                     try {
                         evt.srcElement.setPointerCapture(evt.pointerId);
                     }
@@ -71,7 +71,7 @@ export class FreeCameraSearchInput implements ICameraInput<FreeCamera>{
                         element!.focus();
                     }
                 }
-                else if (p.type === BABYLON.PointerEventTypes.POINTERUP) {
+                else if (p.type === PointerEventTypes.POINTERUP) {
                     try {
                         evt.srcElement.releasePointerCapture(evt.pointerId);
                     }
@@ -83,7 +83,7 @@ export class FreeCameraSearchInput implements ICameraInput<FreeCamera>{
                         evt.preventDefault();
                     }
                 }
-                else if (p.type === BABYLON.PointerEventTypes.POINTERMOVE) {
+                else if (p.type === PointerEventTypes.POINTERMOVE) {
                     if (!this.previousPosition || engine.isPointerLock) {
                         return;
                     }
@@ -138,7 +138,7 @@ export class FreeCameraSearchInput implements ICameraInput<FreeCamera>{
                 evt.preventDefault();
             }
         };
-        this._observer = this.camera!.getScene().onPointerObservable.add(this._pointerInput, BABYLON.PointerEventTypes.POINTERDOWN | BABYLON.PointerEventTypes.POINTERUP | BABYLON.PointerEventTypes.POINTERMOVE);
+        this._observer = this.camera!.getScene().onPointerObservable.add(this._pointerInput, PointerEventTypes.POINTERDOWN | PointerEventTypes.POINTERUP | PointerEventTypes.POINTERMOVE);
         element!.addEventListener("mousemove", this._onSearchMove, false);
     };
 

@@ -3,7 +3,7 @@ import {
     FreeCamera,
     Vector3,
     Camera,
-} from 'babylonjs';
+} from '@babylonjs/core';
 import { MazeCanvasProvider } from '../MazeSceneFactory';
 
 export class MazeFreeCameraFactory {

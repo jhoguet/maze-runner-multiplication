@@ -11,7 +11,7 @@ import {
     ExecuteCodeAction,
     ActionManager,
     Color3
-} from 'babylonjs';
+} from '@babylonjs/core';
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 
 var randomNumber = function (min: number, max: number) {
