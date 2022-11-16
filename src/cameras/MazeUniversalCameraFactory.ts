@@ -10,7 +10,7 @@ import { FreeCameraSearchInput } from './FreeCameraSearchInput';
 export class MazeUniversalCameraFactory {
     static inject = () => [MazeCanvasProvider];
     constructor(private canvasProvider: MazeCanvasProvider) { }
-    createAndAttachCamera = ({ scene }: { scene: Scene }): void => {
+    createAndAttachCamera = ({ scene }: { scene: Scene }): UniversalCamera => {
         const canvas = this.canvasProvider.getCanvas();
 
         var camera = new UniversalCamera("camera1", new Vector3(0, 5, -10), scene);
@@ -29,5 +29,7 @@ export class MazeUniversalCameraFactory {
 
         camera.inputs.add(new FreeCameraSearchInput())
         camera.inputs.add(new FreeCameraKeyboardWalkInput())
+
+        return camera;
     }
 }
