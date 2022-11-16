@@ -12,7 +12,7 @@ import {
     ActionManager,
     Color3
 } from '@babylonjs/core';
-import { Rectangle, AdvancedDynamicTexture } from '@babylonjs/gui/2D';
+import { Rectangle, AdvancedDynamicTexture, TextBlock } from '@babylonjs/gui/2D';
 
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 
@@ -113,13 +113,17 @@ export class MazeSceneFactory {
 
         // gui test
         const rect = new Rectangle();
+        const text = new TextBlock("text", "5 x 6");
         rect.width = .2;
         rect.height = '40px';
         rect.cornerRadius = 20;
         rect.thickness = 4;
         rect.background = 'green';
+        
 
         advancedTexture.addControl(rect);
+        advancedTexture.addControl(text)
+
 
         // Return the created scene
         engine.runRenderLoop(function () {
