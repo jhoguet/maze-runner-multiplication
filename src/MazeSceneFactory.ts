@@ -112,8 +112,10 @@ export class MazeSceneFactory {
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('gui');
 
         // gui test
+        let number1 = Math.round(randomNumber(1, 12))
+        let number2 = Math.round(randomNumber(1, 12))
         const rect = new Rectangle();
-        const text = new TextBlock("text", "5 x 6");
+        const text = new TextBlock("text",String(number1) + " x " + String(number2));
         rect.width = .2;
         rect.height = '40px';
         rect.cornerRadius = 20;
