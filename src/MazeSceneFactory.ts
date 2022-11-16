@@ -12,7 +12,7 @@ import {
     ActionManager,
     Color3
 } from '@babylonjs/core';
-import { Rectangle, AdvancedDynamicTexture, TextBlock } from '@babylonjs/gui/2D';
+import { Rectangle, AdvancedDynamicTexture, TextBlock, Control } from '@babylonjs/gui/2D';
 
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 
@@ -77,6 +77,33 @@ export class MazeSceneFactory {
         });
 
         this.createWall({
+            centerX: 20,
+            centerY: -10,
+            width: 40,
+            height: wallHeight,
+            rotationDegrees: 90,
+            scene
+        });
+
+        this.createWall({
+            centerX: -25,
+            centerY: -10,
+            width: 40,
+            height: wallHeight,
+            rotationDegrees: 90,
+            scene
+        });
+
+        this.createWall({
+            centerX: -2,
+            centerY: -30,
+            width: 46,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
             centerX: -15,
             centerY: 10,
             width: 20,
@@ -98,7 +125,7 @@ export class MazeSceneFactory {
 
         camera.onCollide = mesh => {
             if (mesh.name === 'gap'){
-                camera.position = new Vector3(0, 5, -30);
+                camera.position = new Vector3(0, 5, -28);
             }
         }
 
@@ -138,6 +165,7 @@ export class MazeSceneFactory {
         rect.background = 'green';
         rect.addControl(text)
         advancedTexture.addControl(rect);
+        rect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP
 
         // Return the created scene
         engine.runRenderLoop(function () {
