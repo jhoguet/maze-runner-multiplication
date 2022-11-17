@@ -12,6 +12,8 @@ import {
     ActionManager,
     Color3
 } from '@babylonjs/core';
+import '@babylonjs/core/Debug/debugLayer'; 
+import '@babylonjs/inspector'
 import { Rectangle, AdvancedDynamicTexture, TextBlock, Control } from '@babylonjs/gui/2D';
 
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
@@ -68,16 +70,61 @@ export class MazeSceneFactory {
         const wallHeight = 15;
         // Create a wall
         this.createWall({
-            centerX: 10,
+            centerX: 1,
             centerY: 10,
-            width: 20,
+            width: 2,
             height: wallHeight,
             rotationDegrees: 0,
             scene
         });
 
         this.createWall({
-            centerX: 20,
+            centerX: 8,
+            centerY: 10,
+            width: 2,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
+            centerX: -6,
+            centerY: 10,
+            width: 2,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
+            centerX: -13,
+            centerY: 10,
+            width: 2,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
+            centerX: -20,
+            centerY: 10,
+            width: 2,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
+            centerX: 15,
+            centerY: 10,
+            width: 2,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
+            centerX: 16,
             centerY: -10,
             width: 40,
             height: wallHeight,
@@ -86,7 +133,7 @@ export class MazeSceneFactory {
         });
 
         this.createWall({
-            centerX: -25,
+            centerX: -21,
             centerY: -10,
             width: 40,
             height: wallHeight,
@@ -103,25 +150,48 @@ export class MazeSceneFactory {
             scene
         });
 
-        this.createWall({
-            centerX: -15,
-            centerY: 10,
-            width: 20,
+        this.createGap({
             height: wallHeight,
-            rotationDegrees: 0,
+            canadate: 10, 
+            width: 5, 
+            center: new Vector3(-2.5, wallHeight / 2, 10),
             scene
         });
 
-        const gap = MeshBuilder.CreatePlane("gap", { size: 2, height: wallHeight, width: 5 }, scene);
-        gap.rotation.y = Tools.ToRadians(0);
-        const boxMaterial = new StandardMaterial("Mat", scene);
-        boxMaterial.diffuseColor = Color3.Blue();
-        gap.material = boxMaterial
+        this.createGap({
+            height: wallHeight,
+            canadate: 0, 
+            width: 5, 
+            center: new Vector3(4.5, wallHeight / 2, 10),
+            scene
+        });
 
-        boxMaterial.alpha = 0.1;
-        gap.checkCollisions = true;
+        this.createGap({
+            height: wallHeight,
+            canadate: 6, 
+            width: 5, 
+            center: new Vector3(-9.5, wallHeight / 2, 10),
+            scene
+        });
 
-        gap.position = new Vector3(-2.5, wallHeight / 2, 10);
+        this.createGap({
+            height: wallHeight,
+            canadate: 2, 
+            width: 5, 
+            center: new Vector3(-16.5, wallHeight / 2, 10),
+            scene
+        });
+        this.createGap({
+            height: wallHeight,
+            canadate: 15, 
+            width: 5, 
+            center: new Vector3(11.5, wallHeight / 2, 10),
+            scene
+        });
+
+        //scene.debugLayer.show()
+        
+        
 
         camera.onCollide = mesh => {
             if (mesh.name === 'gap'){
@@ -142,18 +212,7 @@ export class MazeSceneFactory {
 
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('gui');
 
-        const gapTexture = AdvancedDynamicTexture.CreateForMesh(gap);
-
-        const gapRect = new Rectangle();
-        const gapText = new TextBlock("text1", String(answer));
-        gapRect.width = .4;
-        gapRect.height = '60px';
-        gapRect.cornerRadius = 20;
-        gapRect.thickness = 4;
-        gapRect.background = 'green';
-        gapRect.fontSize = '50px'
-        gapRect.addControl(gapText);
-        gapTexture.addControl(gapRect);
+        
 
         // gui test
         const rect = new Rectangle();
@@ -175,6 +234,31 @@ export class MazeSceneFactory {
         window.addEventListener('resize', function () {
             engine.resize();
         });
+    }
+
+    private createGap =(params:{height: number, width: number, center: Vector3, scene:Scene, canadate: number}) => {
+        const gap = MeshBuilder.CreatePlane("gap", { size: 2, height: params.height, width: params.width}, params.scene);
+        gap.rotation.y = Tools.ToRadians(0);
+        const boxMaterial = new StandardMaterial("Mat", params.scene);
+        //boxMaterial.diffuseColor = Color3.Blue();
+        gap.material = boxMaterial
+
+        boxMaterial.alpha = 0;
+        gap.checkCollisions = true;
+
+        gap.position = params.center
+        const gapTexture = AdvancedDynamicTexture.CreateForMesh(gap);
+
+        const gapRect = new Rectangle();
+        const gapText = new TextBlock("text1", String(params.canadate));
+        gapRect.width = .4;
+        gapRect.height = '60px';
+        gapRect.cornerRadius = 20;
+        gapRect.thickness = 4;
+        gapRect.background = 'green';
+        gapRect.fontSize = '50px'
+        gapRect.addControl(gapText);
+        gapTexture.addControl(gapRect);
     }
 
     private createWall = ({ centerX, centerY, width, height, scene, rotationDegrees }: { centerX: number, centerY: number, width: number, height: number, scene: Scene, rotationDegrees: number }) => {
