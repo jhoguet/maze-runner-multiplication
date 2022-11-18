@@ -227,9 +227,36 @@ export class MazeSceneFactory {
         });
 
         this.createWall({
+            centerX: 17,
+            centerY: 30,
+            width: 40,
+            height: wallHeight,
+            rotationDegrees: 90,
+            scene
+        });
+
+        this.createWall({
+            centerX: -21,
+            centerY: 30,
+            width: 40,
+            height: wallHeight,
+            rotationDegrees: 90,
+            scene
+        });
+
+        this.createWall({
             centerX: -2,
             centerY: -30,
             width: 46,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
+        this.createWall({
+            centerX: -2,
+            centerY: 50,
+            width: 40,
             height: wallHeight,
             rotationDegrees: 0,
             scene
