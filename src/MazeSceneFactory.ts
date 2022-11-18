@@ -86,7 +86,9 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
     }
 
     checkExperience = () => {
-        if (this.state.correctCount >= 5){
+        const n = this.state.incorrectCount + this.state.correctCount;
+        const accuracy = this.state.correctCount / n;
+        if (n >= this.getMultiples().length * 4 && accuracy >= .98){
             this.advance();
         }
     }
