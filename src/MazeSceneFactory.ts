@@ -58,7 +58,7 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
     private getOptions = (answer: number): number[] => {
         const options: number[] = [];
 
-        while (options.length <= 4){
+        while (options.length <= 3){
             // random number from -10 to +10
             const offset = Math.floor(Math.random() * 20) - 10;
             const candidate = answer + offset;
@@ -110,14 +110,6 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
     }
 }
 const gameState = (window as any).gameState = new GameState();
-
-var randomNumber = function (min: number, max: number) {
-    if (min === max) {
-        return (min);
-    }
-    var random = Math.random();
-    return ((random * (max - min)) + min);
-};
 
 export class MazeCanvasProvider {
     setCanvas = (canvas: HTMLCanvasElement) => {
@@ -284,11 +276,11 @@ export class MazeSceneFactory {
 
         //scene.debugLayer.show()
 
-
-
         camera.onCollide = mesh => {
             if (mesh.name === 'gap') {
                 camera.position = new Vector3(0, 5, -28);
+                const candidate = Number(mesh.state);
+                gameState.attemptAnswer(candidate);
             }
         }
 
@@ -298,26 +290,27 @@ export class MazeSceneFactory {
         texture.uScale = groundSize / 10
         texture.vScale = groundSize / 10
 
-        let number1 = Math.round(randomNumber(1, 12))
-        let number2 = Math.round(randomNumber(1, 12))
-        let answer = number1 * number2
-
-
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('gui');
 
 
 
         // gui test
         const rect = new Rectangle();
-        const text = new TextBlock("text", String(number1) + " x " + String(number2));
+        const text = new TextBlock("text", '');
         rect.width = .2;
-        rect.height = '40px';
+        rect.height = '60px';
         rect.cornerRadius = 20;
         rect.thickness = 4;
         rect.background = 'green';
+        rect.fontSize = '50px';
         rect.addControl(text)
+        rect.paddingTopInPixels = 10;
         advancedTexture.addControl(rect);
-        rect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP
+        rect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+
+        gameState.subscribe(() => {
+            text.text = `${gameState.state.problem!.left} x ${gameState.state.problem!.right}`;
+        });
 
         const stats = this.createGameStats();
         advancedTexture.addControl(stats);
@@ -359,6 +352,7 @@ export class MazeSceneFactory {
         gameState.subscribe(() => {
             const candidate = gameState.state.problem!.options[params.candidateIndex];
             gapText.text = String(candidate);
+            gap.state = String(candidate);
         });
     }
 
