@@ -142,6 +142,7 @@ export class MazeSceneFactory {
 
         const camera = this.cameraFactory.createAndAttachCamera({ scene });
         camera.position = startPosition.clone();
+        const gapHeight = 5
 
         // Create a basic light, aiming 0, 1, 0 - meaning, to the sky
         new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
@@ -271,41 +272,41 @@ export class MazeSceneFactory {
         });
 
         this.createGap({
-            height: wallHeight,
+            height: gapHeight,
             candidateIndex: 0,
             width: 5,
-            center: new Vector3(-2.5, wallHeight / 2, 10),
+            center: new Vector3(-2.5, gapHeight / 2, 10),
             scene
         });
 
         this.createGap({
-            height: wallHeight,
+            height: gapHeight,
             candidateIndex: 1,
             width: 5,
-            center: new Vector3(4.5, wallHeight / 2, 10),
+            center: new Vector3(4.5, gapHeight / 2, 10),
             scene
         });
 
         this.createGap({
-            height: wallHeight,
+            height: gapHeight,
             candidateIndex: 2,
             width: 5,
-            center: new Vector3(-9.5, wallHeight / 2, 10),
+            center: new Vector3(-9.5, gapHeight / 2, 10),
             scene
         });
 
         this.createGap({
-            height: wallHeight,
+            height: gapHeight,
             candidateIndex: 3,
             width: 5,
-            center: new Vector3(-16.5, wallHeight / 2, 10),
+            center: new Vector3(-16.5, gapHeight / 2, 10),
             scene
         });
         this.createGap({
-            height: wallHeight,
+            height: gapHeight,
             candidateIndex: 4,
             width: 5,
-            center: new Vector3(11.5, wallHeight / 2, 10),
+            center: new Vector3(11.5, gapHeight / 2, 10),
             scene
         });
 
