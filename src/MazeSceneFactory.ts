@@ -29,7 +29,7 @@ const multiplesPerLevel = {
     '6': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
 }
 
-class GameState extends State<{ level: number, correctCount: number, incorrectCount: number, problem?: { left: number, right: number, answer: number} }> {
+class GameState extends State<{ level: number, correctCount: number, incorrectCount: number, problem?: { left: number, right: number, answer: number, options: number[] } }> {
     constructor() {
         super({ level: 1, correctCount: 0, incorrectCount: 0 });
 
@@ -42,23 +42,27 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
         const rightIndex = Math.floor(Math.random() * multiples.length);
         const left = multiples[leftIndex];
         const right = multiples[rightIndex];
+        const answer = left * right;
+        const options = this.getOptions(answer);
+
         this.setState({
             problem: {
                 left,
                 right,
-                answer: left * right,
+                answer,
+                options: [answer, ...options]
             }
         });
     }
 
-    getOptions = (): number[] => {
+    private getOptions = (answer: number): number[] => {
         const options: number[] = [];
 
         while (options.length <= 4){
             // random number from -10 to +10
             const offset = Math.floor(Math.random() * 20) - 10;
-            const candidate = this.state.problem!.answer + offset;
-            if (![...options, this.state.problem!.answer].includes(candidate)){
+            const candidate = answer + offset;
+            if (![...options, answer].includes(candidate)){
                 options.push(candidate);
             }
         }
@@ -105,7 +109,7 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
         }
     }
 }
-(window as any).gameState = new GameState();
+const gameState = (window as any).gameState = new GameState();
 
 var randomNumber = function (min: number, max: number) {
     if (min === max) {
@@ -241,7 +245,7 @@ export class MazeSceneFactory {
 
         this.createGap({
             height: wallHeight,
-            canadate: 10,
+            candidateIndex: 0,
             width: 5,
             center: new Vector3(-2.5, wallHeight / 2, 10),
             scene
@@ -249,7 +253,7 @@ export class MazeSceneFactory {
 
         this.createGap({
             height: wallHeight,
-            canadate: 0,
+            candidateIndex: 1,
             width: 5,
             center: new Vector3(4.5, wallHeight / 2, 10),
             scene
@@ -257,7 +261,7 @@ export class MazeSceneFactory {
 
         this.createGap({
             height: wallHeight,
-            canadate: 6,
+            candidateIndex: 2,
             width: 5,
             center: new Vector3(-9.5, wallHeight / 2, 10),
             scene
@@ -265,14 +269,14 @@ export class MazeSceneFactory {
 
         this.createGap({
             height: wallHeight,
-            canadate: 2,
+            candidateIndex: 3,
             width: 5,
             center: new Vector3(-16.5, wallHeight / 2, 10),
             scene
         });
         this.createGap({
             height: wallHeight,
-            canadate: 15,
+            candidateIndex: 4,
             width: 5,
             center: new Vector3(11.5, wallHeight / 2, 10),
             scene
@@ -328,7 +332,7 @@ export class MazeSceneFactory {
         });
     }
 
-    private createGap =(params:{height: number, width: number, center: Vector3, scene:Scene, canadate: number}) => {
+    private createGap =(params:{height: number, width: number, center: Vector3, scene:Scene, candidateIndex: number}) => {
         const gap = MeshBuilder.CreatePlane("gap", { size: 2, height: params.height, width: params.width}, params.scene);
         gap.rotation.y = Tools.ToRadians(0);
         const boxMaterial = new StandardMaterial("Mat", params.scene);
@@ -342,7 +346,7 @@ export class MazeSceneFactory {
         const gapTexture = AdvancedDynamicTexture.CreateForMesh(gap);
 
         const gapRect = new Rectangle();
-        const gapText = new TextBlock("text1", String(params.canadate));
+        const gapText = new TextBlock("text1", '');
         gapRect.width = .4;
         gapRect.height = '60px';
         gapRect.cornerRadius = 20;
@@ -351,6 +355,11 @@ export class MazeSceneFactory {
         gapRect.fontSize = '50px'
         gapRect.addControl(gapText);
         gapTexture.addControl(gapRect);
+
+        gameState.subscribe(() => {
+            const candidate = gameState.state.problem!.options[params.candidateIndex];
+            gapText.text = String(candidate);
+        });
     }
 
     private createGameStats = (): Rectangle => {
@@ -389,28 +398,6 @@ export class MazeSceneFactory {
         const problem = new TextBlock('problem', '');
         grid.addControl(problem, 4, 0);
 
-
-        grid.addRowDefinition(60, true)
-        const button1 = Button.CreateSimpleButton('button1', '');
-
-        button1.onPointerClickObservable.add(() => {
-            const value = Number(button1.textBlock!.text);
-            gameState.attemptAnswer(value);
-        })
-        button1.addControl(new TextBlock());
-        grid.addControl(button1, 4, 0);
-
-        grid.addRowDefinition(60, true)
-        const button2 = Button.CreateSimpleButton('button2', '');
-
-        button2.onPointerClickObservable.add(() => {
-            const value = Number(button1.textBlock!.text);
-            gameState.attemptAnswer(value);
-        })
-        button2.addControl(new TextBlock());
-        grid.addControl(button2, 5, 0);
-
-
         const gameState = ((window as any).gameState as GameState);
         gameState.subscribe(() => {
             level.text = `Level ${gameState.state.level}`;
@@ -422,9 +409,6 @@ export class MazeSceneFactory {
             } else {
                 accuracy.text = '';
             }
-
-            button1.textBlock!.text = String(gameState.state.problem!.answer);
-            button2.textBlock!.text = String(gameState.getOptions()[0]);
         });
         return stats;
     }
