@@ -3,22 +3,19 @@ import {
     Scene,
     Vector3,
     HemisphericLight,
-    Mesh,
     MeshBuilder,
     StandardMaterial,
     Texture,
     Tools,
-    ExecuteCodeAction,
-    ActionManager,
-    Color3
 } from '@babylonjs/core';
 import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector'
-import { Rectangle, AdvancedDynamicTexture, TextBlock, Control, Grid, Button } from '@babylonjs/gui/2D';
+import { Rectangle, AdvancedDynamicTexture, TextBlock, Control, Grid } from '@babylonjs/gui/2D';
 import { State } from '@symbiotic/green-state';
 
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 
+const startPosition = new Vector3(0, 5, -28);
 
 const multiplesPerLevel = {
     '1': [1, 2, 5, 10],
@@ -125,7 +122,15 @@ export class MazeSceneFactory {
     static inject = () => [MazeCanvasProvider, MazeUniversalCameraFactory];
     constructor(private canvasProvider: MazeCanvasProvider, private cameraFactory: MazeUniversalCameraFactory) { }
 
+    private started = false;
+
     startScene = (): void => {
+        if (this.started){
+            return;
+        }
+
+        this.started = true;
+
         const canvas = this.canvasProvider.getCanvas();
         const engine = new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
         // Create a basic BJS Scene object
@@ -134,6 +139,7 @@ export class MazeSceneFactory {
         (window as any).scene = scene;
 
         const camera = this.cameraFactory.createAndAttachCamera({ scene });
+        camera.position = startPosition.clone();
 
         // Create a basic light, aiming 0, 1, 0 - meaning, to the sky
         new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
@@ -302,12 +308,20 @@ export class MazeSceneFactory {
         });
 
         //scene.debugLayer.show()
+        let ignoreGapCollision = false;
 
         camera.onCollide = mesh => {
-            if (mesh.name === 'gap') {
-                camera.position = new Vector3(0, 5, -28);
-                const candidate = Number(mesh.state);
+            if (!ignoreGapCollision && mesh.name === 'gap') {
+                ignoreGapCollision = true;
+
+                const parsed = JSON.parse(mesh.state);
+                const candidate = Number(parsed.candidate);
                 gameState.attemptAnswer(candidate);
+
+                setTimeout(() => {
+                    ignoreGapCollision = false;
+                }, 500);
+                camera.position = startPosition.clone();
             }
         }
 
@@ -379,14 +393,15 @@ export class MazeSceneFactory {
         gameState.subscribe(() => {
             const candidate = gameState.state.problem!.options[params.candidateIndex];
             gapText.text = String(candidate);
-            gap.state = String(candidate);
+            gap.state = JSON.stringify({ jon: 'was here', candidate });
+            // console.log(gap.state);
         });
     }
 
     private createGameStats = (): Rectangle => {
         const stats = new Rectangle();
         stats.width = '400px';
-        stats.height = '400px';
+        stats.height = '200px';
         stats.cornerRadius = 10;
         stats.thickness = 1;
         stats.background = 'gray';
@@ -403,7 +418,7 @@ export class MazeSceneFactory {
         const level = new TextBlock('level', 'Level 1');
         grid.addControl(level, 0, 0);
 
-        grid.addRowDefinition(60, true)
+        grid.addRowDefinition(0, true)
         const multiples = new TextBlock('multiples', '1, 2, 5, 10');
         grid.addControl(multiples, 1, 0);
 
@@ -415,7 +430,7 @@ export class MazeSceneFactory {
         // const speed = new TextBlock('speed', '10 problems per minute');
         // grid.addControl(speed, 3, 0);
 
-        grid.addRowDefinition(60, true)
+        grid.addRowDefinition(0, true)
         const problem = new TextBlock('problem', '');
         grid.addControl(problem, 4, 0);
 
@@ -426,7 +441,7 @@ export class MazeSceneFactory {
             problem.text = `${gameState.state.problem!.left} x ${gameState.state.problem!.right}`;
             if ((gameState.state.correctCount + gameState.state.incorrectCount) > 0){
                 console.log(gameState.state);
-                accuracy.text = `${Math.round(gameState.state.correctCount / (gameState.state.correctCount + gameState.state.incorrectCount) * 100)}% right`
+                accuracy.text = `${Math.round(gameState.state.correctCount / (gameState.state.correctCount + gameState.state.incorrectCount) * 100)}% right (${gameState.state.correctCount + gameState.state.incorrectCount})`
             } else {
                 accuracy.text = '';
             }
