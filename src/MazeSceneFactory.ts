@@ -50,7 +50,7 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
                 left,
                 right,
                 answer,
-                options: [answer, ...options]
+                options: [answer, ...options].sort(() => Math.random() - .5)
             }
         });
     }
