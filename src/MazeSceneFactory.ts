@@ -58,7 +58,10 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
         while (options.length <= 3){
             // random number from -10 to +10
             const offset = Math.floor(Math.random() * 20) - 10;
-            const candidate = answer + offset;
+            let candidate = answer + offset;
+            if (candidate < 0){
+                candidate = 0;
+            }
             if (![...options, answer].includes(candidate)){
                 options.push(candidate);
             }
