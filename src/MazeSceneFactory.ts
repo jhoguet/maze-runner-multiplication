@@ -142,7 +142,7 @@ export class MazeSceneFactory {
 
         const camera = this.cameraFactory.createAndAttachCamera({ scene });
         camera.position = startPosition.clone();
-        const gapHeight = 5
+        const gapHeight = 15
 
         // Create a basic light, aiming 0, 1, 0 - meaning, to the sky
         new HemisphericLight('light1', new Vector3(0, 1, 0), scene);
@@ -384,13 +384,15 @@ export class MazeSceneFactory {
 
         const gapRect = new Rectangle();
         const gapText = new TextBlock("text1", '');
-        gapRect.width = .4;
-        gapRect.height = '60px';
+        gapRect.widthInPixels = 200;
+        gapRect.heightInPixels = 200;
         gapRect.cornerRadius = 20;
         gapRect.thickness = 4;
         gapRect.background = 'green';
-        gapRect.fontSize = '50px'
+        gapRect.fontSize = '70px'
         gapRect.addControl(gapText);
+        gapRect.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        gapRect.paddingBottomInPixels = 100;
         gapTexture.addControl(gapRect);
 
         gameState.subscribe(() => {
