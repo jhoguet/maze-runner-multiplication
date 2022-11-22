@@ -31,6 +31,7 @@ class GameState extends State<{
     level: number,
     correctCount: number,
     incorrectCount: number,
+    startedAt?: number,
     problem?: { left: number, right: number, answer: number, options: number[], startedAt: number }
 }> {
     constructor() {
@@ -41,7 +42,12 @@ class GameState extends State<{
         return (Date.now() - this.state.problem!.startedAt) / 1000;
     }
 
+    getTotalSecondsElapsed = () => {
+        return (Date.now() - this.state.startedAt!) / 1000;
+    }
+
     start = () => {
+        this.setState({ startedAt: Date.now() });
         this.nextProblem();
     }
 
@@ -470,7 +476,7 @@ export class MazeSceneFactory {
 
         const stats = new Rectangle();
         stats.width = '400px';
-        stats.height = '200px';
+        stats.height = '250px';
         stats.cornerRadius = 10;
         stats.thickness = 1;
         stats.background = 'gray';
@@ -503,26 +509,21 @@ export class MazeSceneFactory {
         const time = new TextBlock('time', '');
         grid.addControl(time, 3, 0);
 
+        grid.addRowDefinition(60, true)
+        const totalTime = new TextBlock('total-time', '');
+        grid.addControl(totalTime, 4, 0);
+
         setInterval(()=>{
             if (gameState.state.problem){
+                totalTime.text = `${gameState.getTotalSecondsElapsed().toFixed(0)} seconds`;
                 time.text = `${gameState.getSecondsElapsed().toFixed(0)} seconds`;
             }
-        }, 1000)
-
-
-        // grid.addRowDefinition(60, true)
-        // const speed = new TextBlock('speed', '10 problems per minute');
-        // grid.addControl(speed, 3, 0);
-
-        grid.addRowDefinition(0, true)
-        const problem = new TextBlock('problem', '');
-        grid.addControl(problem, 4, 0);
+        }, 250);
 
         gameState.subscribe(() => {
             if(gameState.state.problem){
                 level.text = `Level ${gameState.state.level}`;
                 multiples.text = gameState.getMultiples().join(', ');
-                problem.text = `${gameState.state.problem!.left} x ${gameState.state.problem!.right}`;
                 if ((gameState.state.correctCount + gameState.state.incorrectCount) > 0){
                     console.log(gameState.state);
                     accuracy.text = `${Math.round(gameState.state.correctCount / (gameState.state.correctCount + gameState.state.incorrectCount) * 100)}% right (${gameState.state.correctCount + gameState.state.incorrectCount})`
