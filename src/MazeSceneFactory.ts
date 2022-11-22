@@ -7,6 +7,7 @@ import {
     StandardMaterial,
     Texture,
     Tools,
+    Sound
 } from '@babylonjs/core';
 import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector'
@@ -149,6 +150,17 @@ export class MazeSceneFactory {
         const engine = new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
         // Create a basic BJS Scene object
         const scene = new Scene(engine);
+
+        const ambient = new Sound('ambient', './ambient.mp3', scene, null, { loop: true, autoplay: false });
+
+        const wrongSound = new Sound('wrong', './wrong.mp3', scene, null, { loop: false, autoplay: false });
+        const correctSound = new Sound('correct', './correct.mp3', scene, null, { loop: false, autoplay: false });
+        // TODO: tie this to the play button
+        Engine.audioEngine!.useCustomUnlockedButton = true;
+
+        // BABYLON.Engine.audioEngine.useCustomUnlockedButton = true;
+        // BABYLON.Engine.audioEngine.unlock();
+
         // scene.debugLayer.show({  })
         (window as any).scene = scene;
 
@@ -331,7 +343,13 @@ export class MazeSceneFactory {
 
                 const parsed = JSON.parse(mesh.state);
                 const candidate = Number(parsed.candidate);
-                gameState.attemptAnswer(candidate);
+                const isCorrect = gameState.attemptAnswer(candidate);
+
+                if (!isCorrect){
+                    wrongSound.play();
+                } else {
+                    correctSound.play();
+                }
 
                 setTimeout(() => {
                     ignoreGapCollision = false;
@@ -362,6 +380,8 @@ export class MazeSceneFactory {
         button.onPointerClickObservable.add(()=>{
             button.isVisible = false;
             gameState.resetTime();
+            Engine.audioEngine!.unlock();
+            ambient.play();
         });
         button.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         button.paddingBottomInPixels = 100;
@@ -409,7 +429,7 @@ export class MazeSceneFactory {
 
         gap.position = params.center
         const gapTexture = AdvancedDynamicTexture.CreateForMesh(gap);
-        
+
 
         const gapRect = new Rectangle();
         const gapText = new TextBlock("text1", '');
