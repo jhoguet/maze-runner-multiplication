@@ -27,19 +27,22 @@ const multiplesPerLevel = {
     '6': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
 }
 
-class GameState extends State<{ level: number, correctCount: number, incorrectCount: number, startedAt: number, problem?: { left: number, right: number, answer: number, options: number[] } }> {
+class GameState extends State<{
+    level: number,
+    correctCount: number,
+    incorrectCount: number,
+    problem?: { left: number, right: number, answer: number, options: number[], startedAt: number }
+}> {
     constructor() {
-        super({ level: 1, correctCount: 0, incorrectCount: 0, startedAt: Date.now() });
+        super({ level: 1, correctCount: 0, incorrectCount: 0 });
+    }
 
-        this.nextProblem();
-    }
     getSecondsElapsed = () => {
-        return (Date.now() - this.state.startedAt) / 1000;
+        return (Date.now() - this.state.problem!.startedAt) / 1000;
     }
-    resetTime = () => {
-        this.setState({
-            startedAt: Date.now()
-        })
+
+    start = () => {
+        this.nextProblem();
     }
 
     private nextProblem = () => {
@@ -56,7 +59,8 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
                 left,
                 right,
                 answer,
-                options: [answer, ...options].sort(() => Math.random() - .5)
+                options: [answer, ...options].sort(() => Math.random() - .5),
+                startedAt: Date.now()
             }
         });
     }
@@ -83,7 +87,6 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
         if (isCorrect){
             this.setState({
                 correctCount: this.state.correctCount + 1,
-                startedAt: Date.now()
             });
         }
         else {
@@ -378,8 +381,8 @@ export class MazeSceneFactory {
         button.background = 'green';
         button.fontSize = '70px';
         button.onPointerClickObservable.add(()=>{
+            gameState.start();
             button.isVisible = false;
-            gameState.resetTime();
             Engine.audioEngine!.unlock();
             ambient.play();
         });
@@ -388,6 +391,9 @@ export class MazeSceneFactory {
         advancedTexture.addControl(button)
 
         const rect = new Rectangle();
+        gameState.subscribe(() => {
+            rect.isVisible = Boolean(gameState.state.problem);
+        });
         const text = new TextBlock("text", '');
         rect.width = .2;
         rect.height = '60px';
@@ -401,7 +407,9 @@ export class MazeSceneFactory {
         rect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
 
         gameState.subscribe(() => {
-            text.text = `${gameState.state.problem!.left} x ${gameState.state.problem!.right}`;
+            if (gameState.state.problem){
+                text.text = `${gameState.state.problem.left} x ${gameState.state.problem.right}`;
+            }
         });
 
         const stats = this.createGameStats();
@@ -424,6 +432,10 @@ export class MazeSceneFactory {
         //boxMaterial.diffuseColor = Color3.Blue();
         gap.material = boxMaterial
 
+        gameState.subscribe(() => {
+            gap.isVisible = Boolean(gameState.state.problem);
+        });
+
         boxMaterial.alpha = 0;
         gap.checkCollisions = true;
 
@@ -445,14 +457,17 @@ export class MazeSceneFactory {
         gapTexture.addControl(gapRect);
 
         gameState.subscribe(() => {
-            const candidate = gameState.state.problem!.options[params.candidateIndex];
-            gapText.text = String(candidate);
-            gap.state = JSON.stringify({ jon: 'was here', candidate });
-            // console.log(gap.state);
+            if (gameState.state.problem){
+                const candidate = gameState.state.problem.options[params.candidateIndex];
+                gapText.text = String(candidate);
+                gap.state = JSON.stringify({ jon: 'was here', candidate });
+            }
         });
     }
 
     private createGameStats = (): Rectangle => {
+        const gameState = ((window as any).gameState as GameState);
+
         const stats = new Rectangle();
         stats.width = '400px';
         stats.height = '200px';
@@ -465,6 +480,10 @@ export class MazeSceneFactory {
         stats.paddingRight = '10px';
         const grid = new Grid();
         stats.addControl(grid)
+
+        gameState.subscribe(() => {
+            stats.isVisible = Boolean(gameState.state.problem);
+        });
 
         grid.addColumnDefinition(300, true);
 
@@ -485,7 +504,9 @@ export class MazeSceneFactory {
         grid.addControl(time, 3, 0);
 
         setInterval(()=>{
-            time.text = `${gameState.getSecondsElapsed().toFixed(0)} seconds`;
+            if (gameState.state.problem){
+                time.text = `${gameState.getSecondsElapsed().toFixed(0)} seconds`;
+            }
         }, 1000)
 
 
@@ -497,16 +518,17 @@ export class MazeSceneFactory {
         const problem = new TextBlock('problem', '');
         grid.addControl(problem, 4, 0);
 
-        const gameState = ((window as any).gameState as GameState);
         gameState.subscribe(() => {
-            level.text = `Level ${gameState.state.level}`;
-            multiples.text = gameState.getMultiples().join(', ');
-            problem.text = `${gameState.state.problem!.left} x ${gameState.state.problem!.right}`;
-            if ((gameState.state.correctCount + gameState.state.incorrectCount) > 0){
-                console.log(gameState.state);
-                accuracy.text = `${Math.round(gameState.state.correctCount / (gameState.state.correctCount + gameState.state.incorrectCount) * 100)}% right (${gameState.state.correctCount + gameState.state.incorrectCount})`
-            } else {
-                accuracy.text = '';
+            if(gameState.state.problem){
+                level.text = `Level ${gameState.state.level}`;
+                multiples.text = gameState.getMultiples().join(', ');
+                problem.text = `${gameState.state.problem!.left} x ${gameState.state.problem!.right}`;
+                if ((gameState.state.correctCount + gameState.state.incorrectCount) > 0){
+                    console.log(gameState.state);
+                    accuracy.text = `${Math.round(gameState.state.correctCount / (gameState.state.correctCount + gameState.state.incorrectCount) * 100)}% right (${gameState.state.correctCount + gameState.state.incorrectCount})`
+                } else {
+                    accuracy.text = '';
+                }
             }
         });
         return stats;
