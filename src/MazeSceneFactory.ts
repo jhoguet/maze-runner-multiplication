@@ -10,7 +10,7 @@ import {
 } from '@babylonjs/core';
 import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector'
-import { Rectangle, AdvancedDynamicTexture, TextBlock, Control, Grid } from '@babylonjs/gui/2D';
+import { Rectangle, AdvancedDynamicTexture, TextBlock, Control, Grid, Button } from '@babylonjs/gui/2D';
 import { State } from '@symbiotic/green-state';
 
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
@@ -26,11 +26,19 @@ const multiplesPerLevel = {
     '6': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
 }
 
-class GameState extends State<{ level: number, correctCount: number, incorrectCount: number, problem?: { left: number, right: number, answer: number, options: number[] } }> {
+class GameState extends State<{ level: number, correctCount: number, incorrectCount: number, startedAt: number, problem?: { left: number, right: number, answer: number, options: number[] } }> {
     constructor() {
-        super({ level: 1, correctCount: 0, incorrectCount: 0 });
+        super({ level: 1, correctCount: 0, incorrectCount: 0, startedAt: Date.now() });
 
         this.nextProblem();
+    }
+    getSecondsElapsed = () => {
+        return (Date.now() - this.state.startedAt) / 1000;
+    }
+    resetTime = () => {
+        this.setState({
+            startedAt: Date.now()
+        })
     }
 
     private nextProblem = () => {
@@ -73,7 +81,8 @@ class GameState extends State<{ level: number, correctCount: number, incorrectCo
         const isCorrect = this.state.problem!.answer === answer;
         if (isCorrect){
             this.setState({
-                correctCount: this.state.correctCount + 1
+                correctCount: this.state.correctCount + 1,
+                startedAt: Date.now()
             });
         }
         else {
@@ -342,6 +351,22 @@ export class MazeSceneFactory {
 
 
         // gui test
+
+        const button = Button.CreateSimpleButton("button1", "PLAY");
+        button.widthInPixels = 200;
+        button.heightInPixels = 200;
+        button.cornerRadius = 20;
+        button.thickness = 4;
+        button.background = 'green';
+        button.fontSize = '70px';
+        button.onPointerClickObservable.add(()=>{
+            button.isVisible = false;
+            gameState.resetTime();
+        });
+        button.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        button.paddingBottomInPixels = 100;
+        advancedTexture.addControl(button)
+
         const rect = new Rectangle();
         const text = new TextBlock("text", '');
         rect.width = .2;
@@ -384,6 +409,7 @@ export class MazeSceneFactory {
 
         gap.position = params.center
         const gapTexture = AdvancedDynamicTexture.CreateForMesh(gap);
+        
 
         const gapRect = new Rectangle();
         const gapText = new TextBlock("text1", '');
@@ -433,6 +459,15 @@ export class MazeSceneFactory {
         grid.addRowDefinition(60, true)
         const accuracy = new TextBlock('accuracy', 'Accuracy: 100%');
         grid.addControl(accuracy, 2, 0);
+
+        grid.addRowDefinition(60, true)
+        const time = new TextBlock('time', '');
+        grid.addControl(time, 3, 0);
+
+        setInterval(()=>{
+            time.text = `${gameState.getSecondsElapsed().toFixed(0)} seconds`;
+        }, 1000)
+
 
         // grid.addRowDefinition(60, true)
         // const speed = new TextBlock('speed', '10 problems per minute');
