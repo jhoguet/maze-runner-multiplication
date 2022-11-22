@@ -30,6 +30,7 @@ const multiplesPerLevel = {
 class GameState extends State<{
     level: number,
     correctCount: number,
+    elapsedMS?: number;
     incorrectCount: number,
     startedAt?: number,
     problem?: { left: number, right: number, answer: number, options: number[], startedAt: number }
@@ -60,6 +61,13 @@ class GameState extends State<{
         const answer = left * right;
         const options = this.getOptions(answer);
 
+        let elapsedMS = 0
+        if (this.state.problem){
+            const problemElapsedMS = Date.now() - this.state.problem!.startedAt;
+            const levelElapsedMS = this.state.elapsedMS || 0;
+            elapsedMS = levelElapsedMS + problemElapsedMS;
+        }
+
         this.setState({
             problem: {
                 left,
@@ -67,7 +75,8 @@ class GameState extends State<{
                 answer,
                 options: [answer, ...options].sort(() => Math.random() - .5),
                 startedAt: Date.now()
-            }
+            },
+            elapsedMS
         });
     }
 
@@ -396,7 +405,6 @@ export class MazeSceneFactory {
 
 
         // gui test
-
         const button = Button.CreateSimpleButton("button1", "PLAY");
         button.widthInPixels = 200;
         button.heightInPixels = 200;
@@ -495,7 +503,7 @@ export class MazeSceneFactory {
 
         const stats = new Rectangle();
         stats.width = '400px';
-        stats.height = '250px';
+        stats.height = '300px';
         stats.cornerRadius = 10;
         stats.thickness = 1;
         stats.background = 'gray';
@@ -532,6 +540,10 @@ export class MazeSceneFactory {
         const totalTime = new TextBlock('total-time', '');
         grid.addControl(totalTime, 4, 0);
 
+        grid.addRowDefinition(60, true)
+        const levelAvg = new TextBlock('avg-time', '');
+        grid.addControl(levelAvg, 5, 0);
+
         setInterval(()=>{
             if (gameState.state.problem){
                 totalTime.text = `${gameState.getTotalSecondsElapsed().toFixed(0)} seconds`;
@@ -544,11 +556,15 @@ export class MazeSceneFactory {
                 level.text = `Level ${gameState.state.level}`;
                 multiples.text = gameState.getMultiples().join(', ');
                 if ((gameState.state.correctCount + gameState.state.incorrectCount) > 0){
-                    console.log(gameState.state);
                     accuracy.text = `${Math.round(gameState.state.correctCount / (gameState.state.correctCount + gameState.state.incorrectCount) * 100)}% right (${gameState.state.correctCount + gameState.state.incorrectCount})`
                 } else {
                     accuracy.text = '';
                 }
+
+                if (gameState.state.elapsedMS){
+                    levelAvg.text = `${(gameState.state.elapsedMS! / gameState.state.correctCount / 1000).toFixed(0)} avg`;
+                }
+
             }
         });
         return stats;
