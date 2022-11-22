@@ -196,6 +196,15 @@ export class MazeSceneFactory {
 
         const wallHeight = 15;
         // Create a wall
+        const fakeWall = this.createWall({
+            centerX: -2,
+            centerY: 9,
+            width: 40,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
         this.createWall({
             centerX: 1,
             centerY: 10,
@@ -304,6 +313,15 @@ export class MazeSceneFactory {
             scene
         });
 
+        this.createWall({
+            centerX: -2,
+            centerY: 50,
+            width: 40,
+            height: wallHeight,
+            rotationDegrees: 0,
+            scene
+        });
+
         this.createGap({
             height: gapHeight,
             candidateIndex: 0,
@@ -391,6 +409,7 @@ export class MazeSceneFactory {
             button.isVisible = false;
             Engine.audioEngine!.unlock();
             ambient.play();
+            scene.removeMesh(fakeWall);
         });
         button.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
         button.paddingBottomInPixels = 100;
@@ -544,5 +563,6 @@ export class MazeSceneFactory {
         box.checkCollisions = true;
 
         box.position = new Vector3(centerX, height / 2, centerY);
+        return box;
     }
 }
