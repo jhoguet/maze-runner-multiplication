@@ -19,7 +19,7 @@ export class MazeUniversalCameraFactory {
 
         camera.minZ = 0.0001;
         camera.attachControl(canvas, true);
-        camera.speed = 0.02;
+        camera.speed = 0.02 * 3;
         (camera as any).angularSpeed = 0.05;
         (camera as any).angle = Math.PI/2;
         (camera as any).direction = new Vector3(Math.cos((camera as any).angle), 0, Math.sin((camera as any).angle));
