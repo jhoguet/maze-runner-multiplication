@@ -50,6 +50,11 @@ class GameState extends State<{
         return (Date.now() - this.state.startedAt!) / 1000;
     }
 
+    getQuestionsRemaining = () => {
+        const requiredCorrectN = this.getMultiples().length * 4;
+        return requiredCorrectN - this.state.correctCount;
+    }
+
     getTotalSecondsRemaining = () => {
         const msElapsed = Date.now() - this.state.startedAt!;
         const msRemaining = this.totalTimeMS - msElapsed;
@@ -126,9 +131,7 @@ class GameState extends State<{
     }
 
     checkExperience = () => {
-        const n = this.state.incorrectCount + this.state.correctCount;
-        const accuracy = this.state.correctCount / n;
-        if (n >= this.getMultiples().length * 4 && accuracy >= .98){
+        if (this.getQuestionsRemaining() <= 0){
             this.advance();
         }
     }
@@ -542,8 +545,8 @@ export class MazeSceneFactory {
         grid.addControl(accuracy, 2, 0);
 
         grid.addRowDefinition(60, true)
-        const time = new TextBlock('time', '');
-        grid.addControl(time, 3, 0);
+        const questionsRemaining = new TextBlock('questions-remaining', '');
+        grid.addControl(questionsRemaining, 3, 0);
 
         grid.addRowDefinition(60, true)
         const totalTime = new TextBlock('total-time', '');
@@ -556,7 +559,7 @@ export class MazeSceneFactory {
         setInterval(()=>{
             if (gameState.state.problem){
                 totalTime.text = `${gameState.getTotalSecondsElapsed().toFixed(0)} seconds (${Math.round(gameState.getTotalSecondsRemaining())})`;
-                time.text = `${gameState.getSecondsElapsed().toFixed(0)} seconds`;
+                questionsRemaining.text = `${gameState.getQuestionsRemaining()} remaining`;
             }
         }, 250);
 
