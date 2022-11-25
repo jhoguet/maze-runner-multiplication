@@ -276,7 +276,7 @@ class GameState extends State<{
         }
     }
 }
-const gameState = (window as any).gameState = new GameState({ totalTimeMS: 2 * 60 * 1000 });
+const gameState = (window as any).gameState = new GameState({ totalTimeMS: 10 * 60 * 1000 });
 
 export class MazeCanvasProvider {
     setCanvas = (canvas: HTMLCanvasElement) => {
