@@ -69,6 +69,12 @@ class GameState extends State<{
         this.setState({
             startedAt,
             started: true,
+            ended: false,
+            level: 1,
+            correctCount: 0,
+            incorrectCount: 0,
+            problem: undefined,
+            elapsedMS: undefined,
             levelStats: [{
                 level: 1,
                 startedAt,
@@ -626,7 +632,22 @@ export class MazeSceneFactory {
         stats.paddingTop = '10px';
         stats.paddingRight = '10px';
         const grid = new Grid();
-        stats.addControl(grid)
+        stats.addControl(grid);
+
+        const button = Button.CreateSimpleButton("play-again", "Play Again");
+        button.widthInPixels = 200;
+        button.heightInPixels = 200;
+        button.cornerRadius = 20;
+        button.thickness = 4;
+        button.background = 'green';
+        button.fontSize = '70px';
+        button.onPointerClickObservable.add(()=>{
+            gameState.start();
+        });
+
+        stats.addControl(button);
+
+
 
         // grid.adaptHeightToChildren = true;
 
