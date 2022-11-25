@@ -15,6 +15,7 @@ import { Rectangle, AdvancedDynamicTexture, TextBlock, Control, Grid, Button } f
 import { State } from '@symbiotic/green-state';
 
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
+import { GUI3DManager } from '@babylonjs/gui';
 
 const startPosition = new Vector3(0, 5, -28);
 
@@ -56,6 +57,11 @@ class GameState extends State<{
     getQuestionsRemaining = () => {
         const requiredCorrectN = this.getMultiples().length * 4;
         return requiredCorrectN - this.state.correctCount;
+    }
+
+    getPercentComplete = () => {
+        // TODO: DRY RequiredCount
+        return this.state.correctCount / (this.getMultiples().length * 4);
     }
 
     getTotalSecondsRemaining = () => {
@@ -449,7 +455,44 @@ export class MazeSceneFactory {
 
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('gui');
 
+        // prog bar
+        let progBarWidth = (250 / 2 - 2) * 0;
+        const progBar = new Rectangle()
+        progBar.widthInPixels = 250 / 2;
+        progBar.heightInPixels = 25; 
+        progBar.verticalAlignment = 1;
+        progBar.topInPixels = -600;
+        progBar.background = "black";
+        advancedTexture.addControl( progBar );
 
+        const progBarInner = new Rectangle();
+        progBarInner.widthInPixels = progBarWidth; // 250 / 2 - 2
+        progBarInner.heightInPixels = 23; // progressBar.height - (progressBar.thickness *2 )
+        progBarInner.thickness = 0;
+        progBarInner.horizontalAlignment = 0;
+        progBarInner.isVisible = true;
+        progBarInner.topInPixels = -296;
+        progBarInner.leftInPixels = 570
+        progBarInner.background = "green";
+        advancedTexture.addControl( progBarInner );
+        progBarInner.isVisible = true;
+
+        gameState.subscribe(() => {
+            // if not started, then not visible
+            // if  not started, don't call getPercentComplete
+            // can see progress and problem at same time
+            if (gameState.state.started === true) {
+                progBarInner.widthInPixels = (250 / 2 - 2) * gameState.getPercentComplete()
+                progBar.isVisible = true;
+                progBarInner.isVisible = true;
+            } else {
+                progBar.isVisible = false;
+                progBarInner.isVisible = false;
+            }
+            
+
+            // }
+        })
 
         // gui test
         const button = Button.CreateSimpleButton("button1", "PLAY");
@@ -487,6 +530,7 @@ export class MazeSceneFactory {
         rect.fontSize = '50px';
         rect.addControl(text)
         rect.paddingTopInPixels = 10;
+        rect.topInPixels = 100;
         advancedTexture.addControl(rect);
         rect.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
 
