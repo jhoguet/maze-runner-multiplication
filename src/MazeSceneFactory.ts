@@ -35,9 +35,12 @@ class GameState extends State<{
     startedAt?: number,
     problem?: { left: number, right: number, answer: number, options: number[], startedAt: number }
 }> {
-    constructor() {
+    constructor({ totalTimeMS }: { totalTimeMS: number }) {
         super({ level: 1, correctCount: 0, incorrectCount: 0 });
+        this.totalTimeMS = totalTimeMS;
     }
+
+    private totalTimeMS: number;
 
     getSecondsElapsed = () => {
         return (Date.now() - this.state.problem!.startedAt) / 1000;
@@ -45,6 +48,12 @@ class GameState extends State<{
 
     getTotalSecondsElapsed = () => {
         return (Date.now() - this.state.startedAt!) / 1000;
+    }
+
+    getTotalSecondsRemaining = () => {
+        const msElapsed = Date.now() - this.state.startedAt!;
+        const msRemaining = this.totalTimeMS - msElapsed;
+        return msRemaining / 1000;
     }
 
     start = () => {
@@ -139,7 +148,7 @@ class GameState extends State<{
         }
     }
 }
-const gameState = (window as any).gameState = new GameState();
+const gameState = (window as any).gameState = new GameState({ totalTimeMS: 2 * 60 * 1000 });
 
 export class MazeCanvasProvider {
     setCanvas = (canvas: HTMLCanvasElement) => {
@@ -546,7 +555,7 @@ export class MazeSceneFactory {
 
         setInterval(()=>{
             if (gameState.state.problem){
-                totalTime.text = `${gameState.getTotalSecondsElapsed().toFixed(0)} seconds`;
+                totalTime.text = `${gameState.getTotalSecondsElapsed().toFixed(0)} seconds (${Math.round(gameState.getTotalSecondsRemaining())})`;
                 time.text = `${gameState.getSecondsElapsed().toFixed(0)} seconds`;
             }
         }, 250);
