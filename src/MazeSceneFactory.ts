@@ -19,12 +19,12 @@ import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory
 const startPosition = new Vector3(0, 5, -28);
 
 const multiplesPerLevel = {
-    '1': [1, 2, 5, 10],
-    '2': [1, 2, 3, 4, 5, 10],
+    '1': [0, 1, 2, 5, 10],
+    '2': [0, 1, 2, 3, 4, 5, 10],
     '3': [1, 2, 3, 4, 5, 6, 7, 10],
-    '4': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    '5': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    '6': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    '4': [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    '5': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    '6': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
 }
 
 class GameState extends State<{
