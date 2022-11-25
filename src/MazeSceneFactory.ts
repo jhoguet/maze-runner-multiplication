@@ -7,12 +7,13 @@ import {
     StandardMaterial,
     Texture,
     Tools,
-    Sound
+    Sound,
 } from '@babylonjs/core';
 import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector'
 import { Rectangle, AdvancedDynamicTexture, TextBlock, Control, Grid, Button } from '@babylonjs/gui/2D';
 import { State } from '@symbiotic/green-state';
+import moment from 'moment';
 
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
 import { GUI3DManager } from '@babylonjs/gui';
@@ -26,6 +27,83 @@ const multiplesPerLevel = {
     '4': [2, 3, 4, 5, 6, 7, 8, 9, 10],
     '5': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     '6': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+}
+
+interface IRecord {
+    asOf: string;
+    level: number;
+    correctCount: number
+};
+class LeaderBoard {
+    saveAndShow = (record: IRecord) => {
+        console.log('showed');
+        const recordsRaw = window.localStorage.getItem('leader-board');
+        const records: IRecord[] = recordsRaw ? JSON.parse(recordsRaw): [];
+        records.push(record);
+        window.localStorage.setItem('leader-board', JSON.stringify(records));
+        const gui = AdvancedDynamicTexture.CreateFullscreenUI('gui');
+        const stats = new Rectangle();
+        gui.addControl(stats);
+        stats.width = '700px';
+        stats.height = '900px';
+        stats.cornerRadius = 10;
+        stats.thickness = 1;
+        stats.background = 'gray';
+        stats.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        stats.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        stats.paddingTop = '10px';
+        stats.paddingRight = '10px';
+        const grid = new Grid();
+        grid.addColumnDefinition(.1)
+        grid.addColumnDefinition(.3)
+        grid.addColumnDefinition(.3)
+        grid.addColumnDefinition(.3)
+        for (let i = 0; i <= 11; i++){
+            grid.addRowDefinition(.08);
+        }
+        grid.addControl(new TextBlock('', 'Level'), 0, 2);
+        grid.addControl(new TextBlock('', 'Correct'), 0, 3);
+        const sorted = records.sort((a, b) => {
+            return (b.level * 100 + b.correctCount) - (a.level * 100  + a.correctCount);
+        });
+
+        const top10 = sorted.slice(0,9);
+
+        for (let i = 0; i < top10.length; i++){
+            const rank = new TextBlock('', String(i + 1));
+            if (top10[i].asOf === record.asOf){
+                rank.text += ' <=='
+            }
+            grid.addControl(rank, i + 1, 0);
+            grid.addControl(new TextBlock('', moment(top10[i].asOf).format('MMM D hh:mm: a')), i + 1, 1);
+            grid.addControl(new TextBlock('', String(top10[i].level)), i + 1, 2);
+            grid.addControl(new TextBlock('', String(top10[i].correctCount)), i + 1, 3);
+        }
+        if (!top10.find(r => r.asOf === record.asOf)){
+            const index = sorted.indexOf(sorted.find(r => r.asOf === record.asOf)!);
+            const rowIndex = 11;
+            grid.addControl(new TextBlock('', `${index + 1} <==`), rowIndex, 0);
+            grid.addControl(new TextBlock('', moment(record.asOf).format('MMM D hh:mm: a')), rowIndex, 1);
+            grid.addControl(new TextBlock('', String(record.level)), rowIndex, 2);
+            grid.addControl(new TextBlock('', String(record.correctCount)), rowIndex, 3);
+        }
+
+        stats.addControl(grid);
+
+        const button = Button.CreateSimpleButton("play-again", "Play Again");
+        button.widthInPixels = 200;
+        button.heightInPixels = 200;
+        button.cornerRadius = 20;
+        button.thickness = 4;
+        button.background = 'green';
+        button.fontSize = '70px';
+        stats.addControl(button);
+        button.onPointerClickObservable.add(()=>{
+            console.log('removing');
+            gui.removeControl(stats);
+            (window as any).gameState.start();
+        });
+    }
 }
 
 class GameState extends State<{
@@ -681,20 +759,20 @@ export class MazeSceneFactory {
         const grid = new Grid();
         stats.addControl(grid);
 
-        const button = Button.CreateSimpleButton("play-again", "Play Again");
+        const button = Button.CreateSimpleButton("leaderboard", "Leaderboard");
         button.widthInPixels = 200;
-        button.heightInPixels = 200;
+        button.heightInPixels = 100;
         button.cornerRadius = 20;
         button.thickness = 4;
         button.background = 'green';
-        button.fontSize = '70px';
+        button.fontSize = '30px';
+
         button.onPointerClickObservable.add(()=>{
-            gameState.start();
+            button.isEnabled = false;
+            new LeaderBoard().saveAndShow({ asOf: new Date().toISOString(), level: gameState.state.level, correctCount: gameState.state.correctCount });
         });
 
         stats.addControl(button);
-
-
 
         // grid.adaptHeightToChildren = true;
 
