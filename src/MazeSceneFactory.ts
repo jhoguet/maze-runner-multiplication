@@ -456,12 +456,14 @@ export class MazeSceneFactory {
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('gui');
 
         // prog bar
-        let progBarWidth = (250 / 2 - 2) * 0;
+        let progBarWidth = (250 / 2 - 2) * 1;
         const progBar = new Rectangle()
         progBar.widthInPixels = 250 / 2;
         progBar.heightInPixels = 25; 
         progBar.verticalAlignment = 1;
-        progBar.topInPixels = -600;
+        progBar.topInPixels = -577 ;
+        progBar.leftInPixels = 525;
+        progBar.zIndex = 10;
         progBar.background = "black";
         advancedTexture.addControl( progBar );
 
@@ -471,8 +473,9 @@ export class MazeSceneFactory {
         progBarInner.thickness = 0;
         progBarInner.horizontalAlignment = 0;
         progBarInner.isVisible = true;
-        progBarInner.topInPixels = -296;
-        progBarInner.leftInPixels = 570
+        progBarInner.topInPixels = -296 + 23;
+        progBarInner.leftInPixels = 1095;
+        progBarInner.zIndex = 11;
         progBarInner.background = "green";
         advancedTexture.addControl( progBarInner );
         progBarInner.isVisible = true;
@@ -640,7 +643,7 @@ export class MazeSceneFactory {
 
         gameState.subscribe(() => {
             if(gameState.state.problem){
-                level.text = `Level ${gameState.state.level}, ${gameState.getQuestionsRemaining()} remaining`;
+                level.text = `Level ${gameState.state.level} ${gameState.getQuestionsRemaining()} remaining`;
                 multiples.text = gameState.getMultiples().join(', ');
                 if ((gameState.state.correctCount + gameState.state.incorrectCount) > 0){
 
