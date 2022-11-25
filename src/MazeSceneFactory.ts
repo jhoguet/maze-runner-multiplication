@@ -28,15 +28,18 @@ const multiplesPerLevel = {
 }
 
 class GameState extends State<{
+    started: boolean,
+    ended: boolean,
     level: number,
     correctCount: number,
     elapsedMS?: number;
     incorrectCount: number,
     startedAt?: number,
     problem?: { left: number, right: number, answer: number, options: number[], startedAt: number }
+    levelStats: { level: number, correctCount: number, incorrect: { left: number, right: number }[], startedAt: number, completedAt?: number }[]
 }> {
     constructor({ totalTimeMS }: { totalTimeMS: number }) {
-        super({ level: 1, correctCount: 0, incorrectCount: 0 });
+        super({ level: 1, correctCount: 0, incorrectCount: 0, started: false, ended: false, levelStats: [] });
         this.totalTimeMS = totalTimeMS;
     }
 
@@ -62,8 +65,26 @@ class GameState extends State<{
     }
 
     start = () => {
-        this.setState({ startedAt: Date.now() });
+        const startedAt = Date.now();
+        this.setState({
+            startedAt,
+            started: true,
+            levelStats: [{
+                level: 1,
+                startedAt,
+                correctCount: 0,
+                incorrect: []
+            }]
+        });
         this.nextProblem();
+
+        setTimeout(() => {
+            this.end();
+        }, this.totalTimeMS)
+    }
+
+    private end = () => {
+        this.setState({ ended: true, problem: undefined });
     }
 
     private nextProblem = () => {
@@ -113,12 +134,18 @@ class GameState extends State<{
 
     attemptAnswer = (answer: number) => {
         const isCorrect = this.state.problem!.answer === answer;
+        const levelStats = this.state.levelStats.find(s => s.level === this.state.level);
         if (isCorrect){
+            levelStats!.correctCount++;
             this.setState({
                 correctCount: this.state.correctCount + 1,
             });
         }
         else {
+            levelStats!.incorrect.push({
+                left: this.state.problem!.left,
+                right: this.state.problem!.right
+            });
             this.setState({
                 incorrectCount: this.state.incorrectCount + 1
             });
@@ -142,6 +169,14 @@ class GameState extends State<{
 
     advance = () => {
         const level = this.state.level;
+
+        this.state.levelStats.push({
+            level: level + 1,
+            correctCount: 0,
+            incorrect: [],
+            startedAt: Date.now()
+        });
+
         if (level < 6){
             this.setState({
                 level: level + 1,
@@ -435,6 +470,10 @@ export class MazeSceneFactory {
         button.paddingBottomInPixels = 100;
         advancedTexture.addControl(button)
 
+        gameState.subscribe(() => {
+            button.isVisible = !gameState.state.started;
+        });
+
         const rect = new Rectangle();
         gameState.subscribe(() => {
             rect.isVisible = Boolean(gameState.state.problem);
@@ -460,6 +499,8 @@ export class MazeSceneFactory {
         const stats = this.createGameStats();
         advancedTexture.addControl(stats);
 
+
+        advancedTexture.addControl(this.createEndGameStats());
         // Return the created scene
         engine.runRenderLoop(function () {
             scene.render();
@@ -579,6 +620,59 @@ export class MazeSceneFactory {
 
             }
         });
+        return stats;
+    }
+
+    private createEndGameStats = (): Rectangle => {
+
+        const stats = new Rectangle();
+        stats.width = '600px';
+        stats.height = '800px';
+        stats.cornerRadius = 10;
+        stats.thickness = 1;
+        stats.background = 'gray';
+        stats.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        stats.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        stats.paddingTop = '10px';
+        stats.paddingRight = '10px';
+        const grid = new Grid();
+        stats.addControl(grid)
+
+        // grid.adaptHeightToChildren = true;
+
+        // grid.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+
+        gameState.subscribe(() => {
+            stats.isVisible = Boolean(gameState.state.ended);
+        });
+
+        grid.addColumnDefinition(300, true);
+
+        gameState.subscribe(() =>{
+            for (const control of grid.getDescendants()){
+                control.dispose();
+            }
+            let row = 0;
+            for (const stats of gameState.state.levelStats){
+                // TODO: I don't think we're clearing row definition, so we just keep adding them
+                grid.addRowDefinition(60, true)
+                grid.addControl(new TextBlock('', `Level ${stats.level} ${stats.completedAt ? 'completed in ' + Math.round((stats.completedAt - stats.startedAt) / 1000) + ' seconds' : 'incomplete'}`), row, 0);
+                row++;
+                grid.addRowDefinition(60, true)
+                // TODO: what if zero (then don't display that level)
+                grid.addControl(new TextBlock('', `${stats.incorrect.length} wrong (${Math.round(stats.correctCount / (stats.correctCount + stats.incorrect.length) * 100)}% accuracy)`), row, 0);
+                row++;
+                if (!stats.completedAt){
+                    for (const { left, right } of stats.incorrect.slice(0, 3)){
+                        grid.addRowDefinition(60, true)
+                        grid.addControl(new TextBlock('', `${left} x ${right} = ${left * right}`), row, 0);
+                        row++;
+                    }
+                }
+                // top scores...
+            }
+        })
+
         return stats;
     }
 
