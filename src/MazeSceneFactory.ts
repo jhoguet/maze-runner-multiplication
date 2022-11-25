@@ -514,8 +514,8 @@ export class MazeSceneFactory {
         const gameState = ((window as any).gameState as GameState);
 
         const stats = new Rectangle();
-        stats.width = '400px';
-        stats.height = '300px';
+        stats.width = '300px';
+        stats.height = '150px';
         stats.cornerRadius = 10;
         stats.thickness = 1;
         stats.background = 'gray';
@@ -540,41 +540,31 @@ export class MazeSceneFactory {
         const multiples = new TextBlock('multiples', '1, 2, 5, 10');
         grid.addControl(multiples, 1, 0);
 
-        grid.addRowDefinition(60, true)
-        const accuracy = new TextBlock('accuracy', 'Accuracy: 100%');
-        grid.addControl(accuracy, 2, 0);
-
-        grid.addRowDefinition(60, true)
         const questionsRemaining = new TextBlock('questions-remaining', '');
-        grid.addControl(questionsRemaining, 3, 0);
 
         grid.addRowDefinition(60, true)
         const totalTime = new TextBlock('total-time', '');
         grid.addControl(totalTime, 4, 0);
 
-        grid.addRowDefinition(60, true)
-        const levelAvg = new TextBlock('avg-time', '');
-        grid.addControl(levelAvg, 5, 0);
-
         setInterval(()=>{
             if (gameState.state.problem){
-                totalTime.text = `${gameState.getTotalSecondsElapsed().toFixed(0)} seconds (${Math.round(gameState.getTotalSecondsRemaining())})`;
+                totalTime.text = `Remaining time (${Math.round(gameState.getTotalSecondsRemaining())})`;
                 questionsRemaining.text = `${gameState.getQuestionsRemaining()} remaining`;
             }
         }, 250);
 
         gameState.subscribe(() => {
             if(gameState.state.problem){
-                level.text = `Level ${gameState.state.level}`;
+                level.text = `Level ${gameState.state.level}, ${gameState.getQuestionsRemaining()} remaining`;
                 multiples.text = gameState.getMultiples().join(', ');
                 if ((gameState.state.correctCount + gameState.state.incorrectCount) > 0){
-                    accuracy.text = `${Math.round(gameState.state.correctCount / (gameState.state.correctCount + gameState.state.incorrectCount) * 100)}% right (${gameState.state.correctCount + gameState.state.incorrectCount})`
+
                 } else {
-                    accuracy.text = '';
+
                 }
 
                 if (gameState.state.elapsedMS){
-                    levelAvg.text = `${(gameState.state.elapsedMS! / gameState.state.correctCount / 1000).toFixed(0)} avg`;
+
                 }
 
             }
