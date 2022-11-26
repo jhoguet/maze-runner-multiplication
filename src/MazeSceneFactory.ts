@@ -16,7 +16,6 @@ import { State } from '@symbiotic/green-state';
 import moment from 'moment';
 
 import { MazeUniversalCameraFactory } from './cameras/MazeUniversalCameraFactory';
-import { GUI3DManager } from '@babylonjs/gui';
 
 const startPosition = new Vector3(0, 5, -28);
 
