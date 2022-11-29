@@ -6,7 +6,9 @@ import {
     MeshBuilder,
     StandardMaterial,
     Texture,
+    CubeTexture,
     Tools,
+    Color3,
     Sound,
 } from '@babylonjs/core';
 import '@babylonjs/core/Debug/debugLayer';
@@ -338,6 +340,16 @@ export class MazeSceneFactory {
         ground.material = groundMaterial;
         groundMaterial.diffuseTexture = new Texture('https://www.babylonjs-playground.com/textures/floor.png', scene);
 
+        // skybox
+        var skybox = MeshBuilder.CreateBox("skyBox", {size:1000.0});
+        var skyboxMaterial = new StandardMaterial("skyBox");
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.reflectionTexture = new CubeTexture("textures/skybox", scene);
+        skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+        skyboxMaterial.diffuseColor = new Color3(0, 0, 1);
+        skyboxMaterial.specularColor = new Color3(0, 0, 0);
+        skybox.material = skyboxMaterial;			
+
 
         const wallHeight = 15;
         // Create a wall
@@ -657,6 +669,7 @@ export class MazeSceneFactory {
 
         gap.position = params.center
         const gapTexture = AdvancedDynamicTexture.CreateForMesh(gap);
+        
 
 
         const gapRect = new Rectangle();
